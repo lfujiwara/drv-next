@@ -36,36 +36,42 @@ function AddCustomerInnerForm({
   isValidating,
   isSubmitting,
   isValid,
+  touched,
 }: FormikProps<AddCustomerFormValues>) {
+  const hasBeenTouched = Object.values(touched).filter((p) => p).length > 0;
+
   return (
     <Form>
       <FormControl
         isDisabled={isSubmitting}
         isInvalid={!!errors.name}
-        {...getFieldProps("name")}
         id="name"
         mb="2"
       >
         <FormLabel>Nome</FormLabel>
-        <Input />
+        <Input {...getFieldProps("name")} />
         <FormErrorMessage>{errors.name}</FormErrorMessage>
       </FormControl>
       <FormControl
         isDisabled={isSubmitting}
         isInvalid={!!errors.phoneNumber}
-        {...getFieldProps("phoneNumber")}
         id="phoneNumber"
         mb="2"
       >
         <FormLabel>Telefone (WhatsApp)</FormLabel>
-        <Input format="+55 (##) #####-####" mask="_" as={NumberFormat} />
+        <Input
+          {...getFieldProps("phoneNumber")}
+          format="+55 (##) #####-####"
+          mask="_"
+          as={NumberFormat}
+        />
         <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>
       </FormControl>
       <Flex justify="flex-end" mt="4">
         <Button
           colorScheme="teal"
           isLoading={isValidating || isSubmitting}
-          disabled={!isValid}
+          disabled={!isValid || !hasBeenTouched}
           type="submit"
         >
           Enviar
@@ -87,10 +93,9 @@ export const AddCustomerForm = withFormik<
     name: initial?.name || "",
     phoneNumber: initial?.phoneNumber || "",
   }),
-  handleSubmit: async (values, { props, setSubmitting, resetForm }) => {
+  handleSubmit: async (values, { props, setSubmitting }) => {
     if (props.onSubmit) await props.onSubmit(values);
 
-    resetForm();
     setSubmitting(false);
   },
   validate: async (values, { verifyPhoneNumber }) => {
