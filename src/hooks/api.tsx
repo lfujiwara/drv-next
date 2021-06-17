@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { createContext, useContext } from "react";
 
@@ -8,24 +9,20 @@ const makeAxios = () =>
 
 export const ApiContext = createContext({
   api: makeAxios(),
-  pushToken: () => {},
 });
 
 export const ApiContextProvider = ({ children }: { children: any }) => {
+  const { getAccessTokenSilently } = useAuth0();
   const _axios = makeAxios();
-  let tokenInterceptorId: number | undefined;
-  const pushToken = (token: string) => {
-    if (tokenInterceptorId)
-      _axios.interceptors.request.eject(tokenInterceptorId);
 
-    tokenInterceptorId = _axios.interceptors.request.use((req) => {
-      req.headers.authorization = `Bearer ${token}`;
-      return req;
-    });
-  };
+  _axios.interceptors.request.use(async (req) => {
+    const token = await getAccessTokenSilently();
+    req.headers.authorization = `Bearer ${token}`;
+    return req;
+  });
 
   return (
-    <ApiContext.Provider value={{ api: _axios, pushToken }}>
+    <ApiContext.Provider value={{ api: _axios }}>
       {children}
     </ApiContext.Provider>
   );

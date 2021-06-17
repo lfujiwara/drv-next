@@ -1,9 +1,9 @@
-import React from "react";
-import "../main.css";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Layout from "../components/Layout";
-import { ApiContextProvider } from "../hooks/api";
+import { RequireAuth } from "../components/RequireAuth";
+import "../main.css";
 
 const theme = extendTheme({
   fonts: {
@@ -20,13 +20,13 @@ function MyApp({
 }) {
   return (
     <ChakraProvider theme={theme}>
-      <QueryClientProvider client={new QueryClient()}>
-        <ApiContextProvider>
+      <RequireAuth>
+        <QueryClientProvider client={new QueryClient()}>
           <Layout>
             <Component {...pageProps} />
           </Layout>
-        </ApiContextProvider>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </RequireAuth>
     </ChakraProvider>
   );
 }
