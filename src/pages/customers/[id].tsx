@@ -15,14 +15,16 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import React, { ChangeEvent } from "react";
 import { AiFillDelete } from "react-icons/ai";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaEdit, FaWhatsapp } from "react-icons/fa";
 import AddTripModal from "../../components/AddTripModal";
 import ConfirmCallback from "../../components/ConfirmCallback";
-import TripSummary from "../../components/TripSummary";
 import CustomerTripCard from "../../components/CustomerTripCard";
+import EditCustomerModal from "../../components/EditCustomerModal";
 import SelectMonth from "../../components/SelectMonth";
+import TripSummary from "../../components/TripSummary";
 import { useApi } from "../../hooks/api";
 import { useCustomerData } from "../../hooks/useCustomerData";
+import { CustomerData } from "../../util/apiResponse";
 
 function CustomerPage({ id }: { id: number }) {
   const router = useRouter();
@@ -65,13 +67,29 @@ function CustomerPage({ id }: { id: number }) {
       </Head>
       <Box>
         <Flex justify="space-between" direction={["column", "row"]}>
-          <Box>
-            <Text fontWeight="bold" fontSize="xl">
-              {data.data?.name}
-            </Text>
-            <Text color="gray.500">{data.data?.phoneNumber}</Text>
-          </Box>
-          <Box maxW="64" mt={[4, 0]}>
+          <HStack>
+            <Box>
+              <Text fontWeight="bold" fontSize="xl">
+                {data.data?.name}
+              </Text>
+              <Text color="gray.500">{data.data?.phoneNumber}</Text>
+            </Box>
+            {data && (
+              <EditCustomerModal
+                data={data.data as CustomerData}
+                onMutate={() => data.refetch()}
+              >
+                {(onOpen) => (
+                  <IconButton
+                    aria-label="Editar cliente"
+                    onClick={onOpen}
+                    icon={<FaEdit />}
+                  />
+                )}
+              </EditCustomerModal>
+            )}
+          </HStack>
+          <Box mt={[4, 0]}>
             <Text
               direction={["left", "right"]}
               mb="2"
