@@ -8,6 +8,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import { formatISO } from "date-fns";
 import React from "react";
 import { useQueryClient } from "react-query";
 import { useApi } from "../hooks/api";
@@ -42,7 +43,7 @@ function AddTripModal({
                 api
                   .post("/trips", {
                     customerId: v.customer?.id,
-                    date: new Date(v.date + "").toISOString(),
+                    date: formatISO(new Date(v.date + "")),
                     origin: v.origin,
                     destination: v.destination,
                     fare: Number(v.fare) * 100,

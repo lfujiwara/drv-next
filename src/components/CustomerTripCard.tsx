@@ -105,7 +105,9 @@ export default function CustomerTripCard({
       </Flex>
       <Box>
         <Skeleton isLoaded={!!data}>
-          {data && <Text>{dateFormatter.format(new Date(data.date))}</Text>}
+          {data && (
+            <Text>{dateFormatter.format(new Date(data.date + "Z"))}</Text>
+          )}
         </Skeleton>
       </Box>
       <HStack justify="space-around" mt="2">
