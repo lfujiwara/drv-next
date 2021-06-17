@@ -18,7 +18,7 @@ export const RequireAuth: React.FC = ({ children }) => {
     <Auth0Provider
       domain={process.env.NEXT_PUBLIC_AUTH_DOMAIN + ""}
       clientId={process.env.NEXT_PUBLIC_AUTH_CLIENTID + ""}
-      redirectUri={process.env.NEXT_PUBLIC_AUTH_REDIRECTURI + ""}
+      redirectUri={typeof window !== "undefined" ? window.location.origin : ""}
       audience={process.env.NEXT_PUBLIC_AUTH_AUDIENCE + ""}
     >
       <ApiContextProvider>
