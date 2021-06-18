@@ -20,6 +20,13 @@ export type TripData = {
   distance: number;
   fare: number;
   obs: string;
+  paid?: string;
+};
+
+export type MultiTripSummary = {
+  total: TripSummary;
+  paid: TripSummary;
+  unpaid: TripSummary;
 };
 
 export type TripSummary = {

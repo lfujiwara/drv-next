@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useQuery } from "react-query";
 import {
   CustomerData,
+  MultiTripSummary,
   Paged,
   TripData,
   TripSummary,
@@ -28,6 +29,16 @@ export const useCustomerData = (id: number) => {
       .then((response) => response.data as TripSummary)
   );
 
+  const multiSummary = useQuery(
+    ["/trips/customer/", id, "/multi-summary", period],
+    () =>
+      api
+        .get(`/trips/customer/${id}/multi-summary`, {
+          params: makePeriodParams(period),
+        })
+        .then((response) => response.data as MultiTripSummary)
+  );
+
   const trips = useInfiniteQuery(
     ["/trips/customer/", id, period],
     ({ pageParam: { skip, take } = { skip: 0, take: 15 } }) =>
@@ -44,5 +55,5 @@ export const useCustomerData = (id: number) => {
     }
   );
 
-  return { period, setPeriod, data, summary, trips };
+  return { period, setPeriod, data, summary, multiSummary, trips };
 };

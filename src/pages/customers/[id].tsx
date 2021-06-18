@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  Center,
   Container,
   Flex,
   HStack,
@@ -20,20 +22,30 @@ import AddTripModal from "../../components/AddTripModal";
 import ConfirmCallback from "../../components/ConfirmCallback";
 import CustomerTripCard from "../../components/CustomerTripCard";
 import EditCustomerModal from "../../components/EditCustomerModal";
+import { MultiSummary } from "../../components/MultiSummary";
 import SelectMonth from "../../components/SelectMonth";
-import TripSummary from "../../components/TripSummary";
 import { useApi } from "../../hooks/api";
 import { useCustomerData } from "../../hooks/useCustomerData";
+import { useTripPayment } from "../../hooks/useTripPayment";
 import { CustomerData } from "../../util/apiResponse";
 
 function CustomerPage({ id }: { id: number }) {
   const router = useRouter();
   const toast = useToast();
   const { api } = useApi();
-  const { data, summary, trips, period, setPeriod } = useCustomerData(id);
+  const { data, multiSummary, summary, trips, period, setPeriod } =
+    useCustomerData(id);
+  const { pay, unPay } = useTripPayment({
+    onMutate: () => {
+      trips.refetch();
+      multiSummary.refetch();
+      summary.refetch();
+    },
+  });
 
   const onMutate = () => {
     trips.refetch();
+    multiSummary.refetch();
     summary.refetch();
   };
   const onDelete = () => {
@@ -67,7 +79,7 @@ function CustomerPage({ id }: { id: number }) {
       </Head>
       <Box>
         <Flex justify="space-between" direction={["column", "row"]}>
-          <HStack>
+          <HStack flex="1" justifyContent={["space-between", "flex-start"]}>
             <Box>
               <Text fontWeight="bold" fontSize="xl">
                 {data.data?.name}
@@ -132,12 +144,7 @@ function CustomerPage({ id }: { id: number }) {
           </ConfirmCallback>
         </SimpleGrid>
         <Box mt="2">
-          <Box mt="4">
-            <Text fontSize="xl" fontWeight="medium" mb="2">
-              Relatório
-            </Text>
-            <TripSummary data={summary.data} />
-          </Box>
+          <MultiSummary data={multiSummary.data} />
           <Box mt="4">
             <Flex justify="space-between">
               <Text fontSize="xl" fontWeight="medium" mb="2">
@@ -165,9 +172,19 @@ function CustomerPage({ id }: { id: number }) {
                     key={trip.id}
                     data={trip}
                     onMutate={onMutate}
+                    onPay={() => pay(trip.id)}
+                    onUnPay={() => unPay(trip.id)}
                   />
                 ))}
             </SimpleGrid>
+            <Center py="4">
+              <Button
+                onClick={() => trips.fetchNextPage()}
+                disabled={!trips.hasNextPage}
+              >
+                Carregar mais
+              </Button>
+            </Center>
           </Box>
         </Box>
       </Box>

@@ -4,6 +4,7 @@ import {
   FlexProps,
   HStack,
   IconButton,
+  Link,
   Skeleton,
   Text,
   Tooltip,
@@ -15,7 +16,7 @@ import { AiFillDelete } from "react-icons/ai";
 import { FaMapMarkerAlt, FaRegCircle } from "react-icons/fa";
 import { useQueryClient } from "react-query";
 import { useApi } from "../hooks/api";
-import { CustomerData } from "../util/apiResponse";
+import { TripData } from "../util/apiResponse";
 import { formatCurrency } from "../util/currency";
 import { formatDistance } from "../util/distance";
 import ConfirmCallback from "./ConfirmCallback";
@@ -33,18 +34,13 @@ const dateFormatter = Intl.DateTimeFormat("pt-BR", {
 export default function CustomerTripCard({
   data,
   onMutate,
+  onPay,
+  onUnPay,
 }: {
-  data?: {
-    id: number;
-    date: string;
-    origin: string;
-    destination: string;
-    distance: number;
-    fare: number;
-    obs: string;
-    customer?: CustomerData;
-  };
+  data?: TripData;
   onMutate?: () => any;
+  onPay?: () => any;
+  onUnPay?: () => any;
 }) {
   const { api } = useApi();
   const client = useQueryClient();
@@ -56,6 +52,9 @@ export default function CustomerTripCard({
       toast({ title: "Corrida excluída", status: "warning" });
       onMutate && onMutate();
     });
+
+  const isPaid = data && data.paid;
+  const isUnpaid = data && !data.paid;
 
   return (
     <MotionFlex
@@ -134,6 +133,37 @@ export default function CustomerTripCard({
           </Text>
         )}
       </Box>
+      <HStack justify="space-between" alignItems="flex-end" mt="2">
+        <Box>
+          {isPaid && data?.paid && (
+            <Box>
+              <Box>Pago em</Box>
+              <Box fontSize="sm">
+                {dateFormatter.format(new Date(data.paid))}
+              </Box>
+            </Box>
+          )}
+          {isUnpaid && <Text color="gray.500">Pendente</Text>}
+        </Box>
+        {onPay && onUnPay && (
+          <Box>
+            <ConfirmCallback
+              message={
+                isPaid
+                  ? "Deseja cancelar o pagamento?"
+                  : "Deseja confirmar o pagamento?"
+              }
+              onOk={(isPaid && onUnPay) || (isUnpaid && onPay) || undefined}
+            >
+              {(onOpen) => (
+                <Link onClick={onOpen}>
+                  {(isPaid && "Cancelar") || "Pagar"}
+                </Link>
+              )}
+            </ConfirmCallback>
+          </Box>
+        )}
+      </HStack>
       {data?.customer && (
         <Flex flex="1" direction="column" justify="flex-end" mt="2">
           <CustomerCard {...data.customer} />
