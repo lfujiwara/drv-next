@@ -36,3 +36,10 @@ export type TripSummary = {
   distanceAvg: number;
   distanceSum: number;
 };
+
+export type CustomerPendingSummary = {
+  count: number;
+  total: number;
+  from: string;
+  monthsWithPendingTrips: string[];
+};

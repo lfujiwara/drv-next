@@ -19,6 +19,8 @@ import React, { ChangeEvent } from "react";
 import { AiFillDelete } from "react-icons/ai";
 import { FaEdit, FaWhatsapp } from "react-icons/fa";
 import AddTripModal from "../../components/AddTripModal";
+import { AlertCustomerPendingSummary } from "../../components/AlertCustomerPendingSummary";
+import { WithCustomerPendingSummary } from "../../components/api-hoc/WithCustomerPendingSummary";
 import ConfirmCallback from "../../components/ConfirmCallback";
 import CustomerTripCard from "../../components/CustomerTripCard";
 import EditCustomerModal from "../../components/EditCustomerModal";
@@ -127,6 +129,13 @@ function CustomerPage({ id }: { id: number }) {
             </HStack>
           </Box>
         </Flex>
+        <WithCustomerPendingSummary id={id}>
+          {(query) =>
+            query.data && (
+              <AlertCustomerPendingSummary data={query.data} my="2" />
+            )
+          }
+        </WithCustomerPendingSummary>
         <SimpleGrid gap="2" columns={[3, 4, 5, 6]} mt="2">
           <NextLink
             href={`https://api.whatsapp.com/send?phone=${data.data?.phoneNumber}`}
